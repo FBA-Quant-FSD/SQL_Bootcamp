@@ -1,0 +1,136 @@
+<Section 4 - Assesment Test>
+Q1. Need to return customer ID who have spent more than $110 with the staff number 2
+SELECT customer_id, SUM(amount) FROM payment
+WHERE staff_id = 2
+GROUP BY customer_id
+HAVING SUM(amount) > 110;
+
+Q2. How many films begin with letter j
+SELECT COUNT(title) FROM film
+WHERE title LIKE 'J%';
+
+Q3. Highest customer ID number whose name starts with E and has an address ID lower than 500
+SELECT first_name, last_name FROM customer
+WHERE first_name LIKE 'E%'
+AND address_id < 500
+ORDER BY customer_id DESC
+LIMIT 1;
+
+<SEC 5 JOINS>
+
+CH 39: As Statement
+# AS statement is used so that columns could be renamed (ALIAS) in a way that it is more easier to comprehend
+ex) sum of amount -> net revenue etc.
+# However it has to go at the very end of the query, only inside of the select statement
+## Exercise codes
+SELECT COUNT(amount) FROM payment - object which COUNT(amount) indicates is unclear
+SELECT COUNT(amount) AS num_transactions
+FROM payment - Clear what data output indicates
+
+SELECT customer_id, SUM(amount) FROM payment
+GROUP BY customer_id - Unclear What SUM(amount) indicates
+SELECT customer_id, SUM(amount) AS total_spent 
+FROM payment
+GROUP BY customer_id - clear what SUM(amount) indicates
+
+SELECT customer_id, SUM(amount) AS total_Spent
+FROM payment
+GROUP BY customer_id
+HAVING SUM(amount) > 100 - Alias gets assigned at the very end of the query so it cannot fit into any conditional statements
+
+SELECT customer_id, SUM(amount) AS total_Spent
+FROM payment
+GROUP BY customer_id
+HAVING total_Spent > 100 - impossible
+
+CH 40: INNER JOINTS  
+#Joins - Combine multiple tables together + INNER JOIN - intersection
+#General Syantx 
+SELECT * FROM Registrations
+INNER JOIN Login ON Registrations.name = Login.name
+# to get rid of duplication
+Select reg_id, Logins.name, log_id FROM Registrations
+INNER JOIN Logins
+ON Registrations.name = Logins.name
+## Exercise codes
+SELECT payment_id, payment.customer_id, first_name 
+FROM payment
+INNER JOIN customer
+ON payment.customer_id = customer.customer_id
+
+CH 41: Outer JOINTS
+# Combine tables together in union way, and filling values that are not present in both tables with null
+# Using WHERE we can find out rows where there exists null column
+# Always specify table when using joins, null is a class so conditionalize not with = but with IS
+## Exercise codes
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+WHERE customer.customer_id IS null
+OR payment.payment_id IS null - check if any value in columns is null
+
+SELECT COUNT(DISTINCT (customer_id)) FROM payment
+SELECT COUNT(DISTINCT (customer_id)) FROM customer - checking method 2
+
+CH 41: LEFT OUTER JOINTS
+# FULL OUTER JOINT with orders(non symmetrical) - return components in A and B + exclusive to A
+# Using WHERE you can find exclusive components
+## Exercise codes
+SELECT * FROM inventory
+SELECT * FROM film
+
+SELECT film.film_id, title, inventory_id, store_id
+FROM film
+LEFT OUTER JOIN inventory ON
+Inventory.film_id = film.film_id
+
+SELECT film.film_id, title, inventory_id, store_id
+FROM film
+LEFT OUTER JOIN inventory ON
+Inventory.film_id = film.film_id
+WHERE inventory.film_id IS NULL
+
+CH 41: RIGHT OUTER JOINTS
+# Same thing as different order in LEFT JOINT (not a complementary concept)
+
+CH 42: UNION
+# Simple addition of the table - pasting rows
+
+CH 42: JOIN challenge tasks
+Q1. 
+Strategy: 
+1) find which tables to emerge - we need customer emails who live in california: combine address and customer
+2) find comlumns which are both present in both table and merge: address id   
+3) filter using WHERE
+Select district, email FROM address
+INNER JOIN customer 
+ON address.address_id = customer.address_id
+WHERE district = 'California'
+
+Q2.
+Strategy:
+1) find which tables to emerge - we need movies starring Nick Wahlberg: combine film and film_actor
+2) find comlumns which are both present in both table and merge: film_id
+) filter using WHERE
+
+Q3.
+Select title, first_name, last_name FROM film
+INNER JOIN film_actor ON film.film_id = film_actor.film_id
+INNER JOIN actor ON film_actor.actor_id = actor.actor_id
+WHERE first_name = 'Nick' AND last_name = 'Wahlberg'
+
+
+
+
+
+
+
+
+
+
+
+

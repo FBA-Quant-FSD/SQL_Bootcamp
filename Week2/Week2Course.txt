@@ -1,0 +1,185 @@
+<Week2>
+
+- **JOIN**
+
+→ 여러 테이블을 결합하는 것
+
+-INNER JOINS
+
+-OUTER JOINS
+
+-FULL JOINS
+
+-UNIONS
+
+- **AS**
+
+‘alias’ 만드는 것 → column의 이름 바꾸는 기능
+
+SELECT column AS new_name FROM table
+
+SELECT SUM(column) AS new_name FROM table
+
+#옳은 예
+
+SELECT customer_id, SUM(amount)
+AS total_spent
+FROM payment
+GROUP BY customer_id
+HAVING SUM(amount)>100
+
+#틀린 예
+
+SELECT customer_id, SUM(amount)
+AS total_spent
+FROM payment
+GROUP BY customer_id
+HAVING SUM(total_spent)>100
+
+→ AS는 맨 마지막에 할당 → HAVING에는 원래 명칭을 사용해야 함
+
+- **INNER JOIN**
+
+: 두 테이블의 교집합
+
+SELECT * FROM TableA
+
+INNER JOIN TableB
+
+ON TableA.col_match = TableB.col_match
+
+SELECT reg_id, **Logins.name**, log_id
+
+FROM Registrations
+
+INNER JOIN Logins
+
+ON [Registrations.name](http://Registrations.name) = Logins.name
+
+ex)
+
+#두 테이블에 모두 들어가는 column → table.column으로 명시해주기
+
+SELECT payment_id,**payment.customer_id**, first_name
+FROM payment
+INNER JOIN customer
+ON payment.customer_id = customer.customer_id
+
+- **OUTER JOIN**
+
+→ 한 테이블에만 있는 value를 다룰 때 사용
+
+→ 없는 값은 **null** 처리
+
+**-FULL OUTER JOIN**
+
+**-LEFT OUTER JOIN**
+
+**-RIGHT OUTER JOIN**
+
+- **FULL OUTER JOIN**
+
+SELECT * FROM TableA
+
+FULL OUTER JOIN TableB
+
+ON TableA.col_match = TableB.col_match
+
+→ FULL OUTER JOIN & WHERE 함께 활용
+
+SELECT * FROM TableA
+
+FULL OUTER JOIN TableB
+
+ON TableA.col_match = TableB.col_match
+
+WHERE [TableA.i](http://TableA.is)d IS null OR [TableB.id](http://TableB.id) IS null
+
+: **교집합을 제외한 합집합 출력**
+
+ex)
+
+1
+
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+
+2
+
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+WHERE customer.customer_id IS null
+OR payment.payment_id IS null
+
+→ 빈 값 출력
+
+→ 의미 : 
+
+결제하지도 않은 고객 정보를 갖지 않음 → 기업이 고객 개인정보 보호를 준수 중이다
+
+고객에 대한 정보가 있는 경우 이는 고객이 과거에 일부 결제를 수행했기 때문이다
+
+- **LEFT OUTER JOIN**
+
+→ Table A값만 출력
+
+→ 여기선 FROM / LEFT JOIN 뒤에 어떤 테이블이 오는지 순서 상관있음
+
+SELECT * FROM TableA
+
+LEFT (OUTER) JOIN TableB
+
+ON TableA.col_match = TableB.col_match
+
+WHERE문 사용
+
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+WHERE payment.payment_id IS null
+
+→ **A-B 출력**
+
+ex)
+
+SELECT film.film_id,title,inventory_id, store_id
+FROM film
+LEFT JOIN inventory ON
+inventory.film_id = film.film_id
+WHERE inventory.film_id IS null
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9cb4ae09-a2dc-46df-9fe2-b110e2823897/Untitled.png)
+
+의미 : Alice Fantasia라는 영화는 재고가 없고 어떤 상점에도 없다!
+
+- RIGHT  OUTER JOIN
+
+→ LEFT JOIN과 동일(테이블만 오른쪽 기준으로 바꿈)
+
+SELECT * FROM TableA
+
+RIGHT (OUTER) JOIN TableB
+
+ON TableA.col_match = TableB.col_match
+
+SELECT * FROM TableA
+
+RIGHT (OUTER) JOIN TableB
+
+ON TableA.col_match = TableB.col_match
+
+WHERE [TableA.id](http://TableA.id) IS null
+
+**B-A**
+
+- ON
+
+2개 이상의 SELECT 결합
+
+SELECT column_name(s) FROM table1
+
+UNION
+
+SELECT column_names(s) FROM table2;

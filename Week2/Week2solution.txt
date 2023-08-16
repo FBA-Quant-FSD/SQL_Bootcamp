@@ -1,0 +1,40 @@
+Assessment Test1
+
+1
+SELECT customer_id, SUM(amount) 
+FROM payment
+WHERE staff_id = 2
+GROUP BY customer_id
+HAVING SUM(amount)>=110
+
+2
+SELECT COUNT(title)
+FROM film
+WHERE title LIKE 'J%'
+
+3
+SELECT first_name, last_name, customer_id 
+FROM customer
+WHERE address_id<500 AND
+first_name LIKE 'E%'
+ORDER BY customer_id DESC
+LIMIT 1;
+
+
+JOIN Challenges
+
+1
+SELECT district, email 
+FROM address
+INNER JOIN customer
+ON address.address_id = customer.address_id
+WEHRE district = 'California'
+
+2
+SELECT title, first_name, last_name 
+FROM actor
+INNER JOIN film_actor
+ON actor.actor_id = film_actor.actor_id
+INNER JOIN film
+ON film.film_id = film_actor.film_id
+WHERE first_name = 'Nick' AND last_name = 'Wahlberg'

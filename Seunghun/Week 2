@@ -123,6 +123,109 @@ INNER JOIN film_actor ON film.film_id = film_actor.film_id
 INNER JOIN actor ON film_actor.actor_id = actor.actor_id
 WHERE first_name = 'Nick' AND last_name = 'Wahlberg'
 
+<SEC 6 Advance SQL Commands>
+!! check documentation
+
+CH 47: Timestamps and Extract - Part One
+# TIME + DATE = TIMESTAMP, TIMESTAMP + TIMEZONE = TIMESTAMPZ - choose accordingly
+# can remove components but cannot add it - think long term
+##Exercise
+SHOW ALL - Show parameter
+SHOW TIMEZONE
+SELECT NOW() - Current timestampz
+SELECT TIMEOFDAY() - Text string
+SELECT CURRENT_TIME/CURRENT_DATE
+
+CH 47: Timestamps and Extract - Part Two
+# EXTRACT - extract sub-component of the timestamp EX:EXTRACT(YEAR FROM date_col)
+# AGE - how old timestamp is
+# TO_CHAR - converting to text, two parameter - date_col, timestamp
+## Exercise
+SELECT EXTRACT(YEAR FROM payment_date)
+FROM payment
+SELECT EXTRACT(YEAR FROM payment_date) AS Year
+FROM payment - Using Alias to rename the colunms
+SELECT AGE(payment_date) 
+FROM payment
+SELECT TO_CHAR(payment_date, 'MONTH-YYYY') 
+FROM payment 
+SELECT TO_CHAR(payment_date, 'MONTHYYYY') 
+FROM payment - No stash
+SELECT TO_CHAR(payment_date, 'MM/dd/YYYY') 
+FROM payment - Use conversion template
+
+CH 50: Timestamps and Extract - Challenge Tasks
+Q1.
+1. need which months payment occur in full month name
+2. for full month name use TO_CHAR(payment_date, 'Month')
+3. Use DISTINCT
+SELECT DISTINCT(TO_CHAR(payment_date, 'Month')) AS months FROM payment 
+
+Q2. 
+1. TO_CHAR always outputs a 9-lettered character
+SELECT COUNT(TO_CHAR(payment_date, 'Day')) FROM payment 
+WHERE TO_CHAR(payment_date, 'Day') = 'Monday   '
+
+CH 51: Mathemarical Funcations and Operators
+SELECT rental_rate/replacement_cost FROM film
+SELECT ROUND(rental_rate/replacement_cost, 2) FROM film
+SELECT ROUND(rental_rate/replacement_cost, 2)*100 AS percent_cost FROM film
+
+CH 52: String Functions and Operators
+# String Concatnation
+SELECT LENGTH(first_name) FROM customer
+# String Concatnation
+SELECT first_name || last_name FROM customer
+SELECT first_name||' ' ||last_name AS full_name FROM customer - use ' ' for space when concatenating and ALIAS for renaming
+SELECT upper(first_name)||' ' ||upper(last_name) AS full_name FROM customer - can pass output of string function
+SELECT LOWER(LEFT(first_name, 1)) || LOWER(last_name)|| '@gmail.com' 
+AS customer_email
+FROM customer - LEFT function for first n letter in a string
+
+CH 53: Subquery
+# query as a conditional - subquery - always returned first
+# use subquery as a conditional for IN
+# EXIST Test if row satisfying certain conditions exist
+## Exercise
+SELECT title FROM film
+WHERE rental_rate > (SELECT AVG(rental_rate) from film) - start with the subquery
+SELECT film_id, title FROM film
+WHERE film_id IN
+(SELECT film_id 
+FROM rental
+INNER JOIN inventory ON rental.inventory_id = inventory.inventory_id
+WHERE return_date BETWEEN '2005-05-29' AND '2005-05-30') - Condition has multiple value - use IN
+SELECT first_name, last_name
+FROM customer AS c
+WHERE EXISTS
+(SELECT * FROM payment AS p WHERE p.customer_id = c.customer_id
+AND amount > 11) - rename colunm name and can pass it down
+
+CH 53: Self Join
+# table is joined to itself
+# must use alias
+SELECT tableA.col, tableB.col
+FROM table AS tableA
+JOIN table AS tableB 
+ON tableA.some_col = tableB.other_col - different names for same table
+## Exercise
+SELECT f1.title, f2.title, f1.lenght 
+FROM film AS f1
+INNER JOIN film AS f2 ON 
+f1.film_id != f2.film_id
+AND f1.length = f2.length 
+- use not equal sign to avoid matching with itself
+- statement after ON is some sort of condition JOIN rows
+
+Assesment Test #2
+
+
+
+
+
+
+
+
 
 
 

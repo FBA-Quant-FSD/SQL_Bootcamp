@@ -1,0 +1,239 @@
+<Section 4 - Assesment Test>
+Q1. Need to return customer ID who have spent more than $110 with the staff number 2
+SELECT customer_id, SUM(amount) FROM payment
+WHERE staff_id = 2
+GROUP BY customer_id
+HAVING SUM(amount) > 110;
+
+Q2. How many films begin with letter j
+SELECT COUNT(title) FROM film
+WHERE title LIKE 'J%';
+
+Q3. Highest customer ID number whose name starts with E and has an address ID lower than 500
+SELECT first_name, last_name FROM customer
+WHERE first_name LIKE 'E%'
+AND address_id < 500
+ORDER BY customer_id DESC
+LIMIT 1;
+
+<SEC 5 JOINS>
+
+CH 39: As Statement
+# AS statement is used so that columns could be renamed (ALIAS) in a way that it is more easier to comprehend
+ex) sum of amount -> net revenue etc.
+# However it has to go at the very end of the query, only inside of the select statement
+## Exercise codes
+SELECT COUNT(amount) FROM payment - object which COUNT(amount) indicates is unclear
+SELECT COUNT(amount) AS num_transactions
+FROM payment - Clear what data output indicates
+
+SELECT customer_id, SUM(amount) FROM payment
+GROUP BY customer_id - Unclear What SUM(amount) indicates
+SELECT customer_id, SUM(amount) AS total_spent 
+FROM payment
+GROUP BY customer_id - clear what SUM(amount) indicates
+
+SELECT customer_id, SUM(amount) AS total_Spent
+FROM payment
+GROUP BY customer_id
+HAVING SUM(amount) > 100 - Alias gets assigned at the very end of the query so it cannot fit into any conditional statements
+
+SELECT customer_id, SUM(amount) AS total_Spent
+FROM payment
+GROUP BY customer_id
+HAVING total_Spent > 100 - impossible
+
+CH 40: INNER JOINTS  
+#Joins - Combine multiple tables together + INNER JOIN - intersection
+#General Syantx 
+SELECT * FROM Registrations
+INNER JOIN Login ON Registrations.name = Login.name
+# to get rid of duplication
+Select reg_id, Logins.name, log_id FROM Registrations
+INNER JOIN Logins
+ON Registrations.name = Logins.name
+## Exercise codes
+SELECT payment_id, payment.customer_id, first_name 
+FROM payment
+INNER JOIN customer
+ON payment.customer_id = customer.customer_id
+
+CH 41: Outer JOINTS
+# Combine tables together in union way, and filling values that are not present in both tables with null
+# Using WHERE we can find out rows where there exists null column
+# Always specify table when using joins, null is a class so conditionalize not with = but with IS
+## Exercise codes
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+WHERE customer.customer_id IS null
+OR payment.payment_id IS null - check if any value in columns is null
+
+SELECT COUNT(DISTINCT (customer_id)) FROM payment
+SELECT COUNT(DISTINCT (customer_id)) FROM customer - checking method 2
+
+CH 41: LEFT OUTER JOINTS
+# FULL OUTER JOINT with orders(non symmetrical) - return components in A and B + exclusive to A
+# Using WHERE you can find exclusive components
+## Exercise codes
+SELECT * FROM inventory
+SELECT * FROM film
+
+SELECT film.film_id, title, inventory_id, store_id
+FROM film
+LEFT OUTER JOIN inventory ON
+Inventory.film_id = film.film_id
+
+SELECT film.film_id, title, inventory_id, store_id
+FROM film
+LEFT OUTER JOIN inventory ON
+Inventory.film_id = film.film_id
+WHERE inventory.film_id IS NULL
+
+CH 41: RIGHT OUTER JOINTS
+# Same thing as different order in LEFT JOINT (not a complementary concept)
+
+CH 42: UNION
+# Simple addition of the table - pasting rows
+
+CH 42: JOIN challenge tasks
+Q1. 
+Strategy: 
+1) find which tables to emerge - we need customer emails who live in california: combine address and customer
+2) find comlumns which are both present in both table and merge: address id   
+3) filter using WHERE
+Select district, email FROM address
+INNER JOIN customer 
+ON address.address_id = customer.address_id
+WHERE district = 'California'
+
+Q2.
+Strategy:
+1) find which tables to emerge - we need movies starring Nick Wahlberg: combine film and film_actor
+2) find comlumns which are both present in both table and merge: film_id
+) filter using WHERE
+
+Q3.
+Select title, first_name, last_name FROM film
+INNER JOIN film_actor ON film.film_id = film_actor.film_id
+INNER JOIN actor ON film_actor.actor_id = actor.actor_id
+WHERE first_name = 'Nick' AND last_name = 'Wahlberg'
+
+<SEC 6 Advance SQL Commands>
+!! check documentation
+
+CH 47: Timestamps and Extract - Part One
+# TIME + DATE = TIMESTAMP, TIMESTAMP + TIMEZONE = TIMESTAMPZ - choose accordingly
+# can remove components but cannot add it - think long term
+##Exercise
+SHOW ALL - Show parameter
+SHOW TIMEZONE
+SELECT NOW() - Current timestampz
+SELECT TIMEOFDAY() - Text string
+SELECT CURRENT_TIME/CURRENT_DATE
+
+CH 47: Timestamps and Extract - Part Two
+# EXTRACT - extract sub-component of the timestamp EX:EXTRACT(YEAR FROM date_col)
+# AGE - how old timestamp is
+# TO_CHAR - converting to text, two parameter - date_col, timestamp
+## Exercise
+SELECT EXTRACT(YEAR FROM payment_date)
+FROM payment
+SELECT EXTRACT(YEAR FROM payment_date) AS Year
+FROM payment - Using Alias to rename the colunms
+SELECT AGE(payment_date) 
+FROM payment
+SELECT TO_CHAR(payment_date, 'MONTH-YYYY') 
+FROM payment 
+SELECT TO_CHAR(payment_date, 'MONTHYYYY') 
+FROM payment - No stash
+SELECT TO_CHAR(payment_date, 'MM/dd/YYYY') 
+FROM payment - Use conversion template
+
+CH 50: Timestamps and Extract - Challenge Tasks
+Q1.
+1. need which months payment occur in full month name
+2. for full month name use TO_CHAR(payment_date, 'Month')
+3. Use DISTINCT
+SELECT DISTINCT(TO_CHAR(payment_date, 'Month')) AS months FROM payment 
+
+Q2. 
+1. TO_CHAR always outputs a 9-lettered character
+SELECT COUNT(TO_CHAR(payment_date, 'Day')) FROM payment 
+WHERE TO_CHAR(payment_date, 'Day') = 'Monday   '
+
+CH 51: Mathemarical Funcations and Operators
+SELECT rental_rate/replacement_cost FROM film
+SELECT ROUND(rental_rate/replacement_cost, 2) FROM film
+SELECT ROUND(rental_rate/replacement_cost, 2)*100 AS percent_cost FROM film
+
+CH 52: String Functions and Operators
+# String Concatnation
+SELECT LENGTH(first_name) FROM customer
+# String Concatnation
+SELECT first_name || last_name FROM customer
+SELECT first_name||' ' ||last_name AS full_name FROM customer - use ' ' for space when concatenating and ALIAS for renaming
+SELECT upper(first_name)||' ' ||upper(last_name) AS full_name FROM customer - can pass output of string function
+SELECT LOWER(LEFT(first_name, 1)) || LOWER(last_name)|| '@gmail.com' 
+AS customer_email
+FROM customer - LEFT function for first n letter in a string
+
+CH 53: Subquery
+# query as a conditional - subquery - always returned first
+# use subquery as a conditional for IN
+# EXIST Test if row satisfying certain conditions exist
+## Exercise
+SELECT title FROM film
+WHERE rental_rate > (SELECT AVG(rental_rate) from film) - start with the subquery
+SELECT film_id, title FROM film
+WHERE film_id IN
+(SELECT film_id 
+FROM rental
+INNER JOIN inventory ON rental.inventory_id = inventory.inventory_id
+WHERE return_date BETWEEN '2005-05-29' AND '2005-05-30') - Condition has multiple value - use IN
+SELECT first_name, last_name
+FROM customer AS c
+WHERE EXISTS
+(SELECT * FROM payment AS p WHERE p.customer_id = c.customer_id
+AND amount > 11) - rename colunm name and can pass it down
+
+CH 53: Self Join
+# table is joined to itself
+# must use alias
+SELECT tableA.col, tableB.col
+FROM table AS tableA
+JOIN table AS tableB 
+ON tableA.some_col = tableB.other_col - different names for same table
+## Exercise
+SELECT f1.title, f2.title, f1.lenght 
+FROM film AS f1
+INNER JOIN film AS f2 ON 
+f1.film_id != f2.film_id
+AND f1.length = f2.length 
+- use not equal sign to avoid matching with itself
+- statement after ON is some sort of condition JOIN rows
+
+Assesment Test #2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

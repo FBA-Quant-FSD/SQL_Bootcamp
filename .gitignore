@@ -1,1 +1,8 @@
+# vscode IDE
 .vscode/settings.json
+
+# pycache
+**/__pycache__
+
+# on mac
+**/.DS_Store
